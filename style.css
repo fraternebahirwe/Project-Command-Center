@@ -1,0 +1,662 @@
+:root {
+  --bg-main: #0b1120;
+  --bg-card: #111827;
+  --bg-card-hover: #162033;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --border-color: #243244;
+  --border-hover: #334155;
+
+  --accent-default: #6366f1;
+  --accent-blue: #3b82f6;
+  --danger: #ef4444;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+/* =========================
+   RESET
+========================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(99, 102, 241, 0.08),
+      transparent 30%
+    ),
+    var(--bg-main);
+  color: var(--text-primary);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
+  padding: 2rem;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* =========================
+   APP CONTAINER
+========================= */
+
+.app-container {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 0.45rem;
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.main-content {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* =========================
+   BASE CARD
+========================= */
+
+.card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.025),
+      transparent
+    ),
+    var(--bg-card);
+
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.form-card {
+  padding: 1.4rem;
+  position: sticky;
+  top: 2rem;
+}
+
+.form-card h2,
+.list-card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.form-card h2 {
+  margin-bottom: 1.25rem;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.form-group input[type="text"],
+.form-group select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.65rem 0.75rem;
+
+  background: #0c1526;
+  color: var(--text-primary);
+
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group input[type="text"]:hover,
+.form-group select:hover {
+  border-color: var(--border-hover);
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  border-color: var(--accent-default);
+  background: #0d1729;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+
+/* Color picker */
+
+.form-group input[type="color"] {
+  width: 100%;
+  height: 42px;
+  padding: 4px;
+
+  background: #0c1526;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+}
+
+.form-group input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-group input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
+
+/* =========================
+   PRIMARY BUTTON
+========================= */
+
+.btn-primary {
+  width: 100%;
+  min-height: 44px;
+
+  background: linear-gradient(
+    135deg,
+    #6366f1,
+    #4f46e5
+  );
+
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+
+  font-size: 0.9rem;
+  font-weight: 650;
+
+  box-shadow:
+    0 8px 20px rgba(79, 70, 229, 0.22);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 10px 24px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   PROJECT LIST
+========================= */
+
+.list-card {
+  padding: 1.4rem;
+  min-width: 0;
+}
+
+.list-card > h2 {
+  margin-bottom: 1.15rem;
+}
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-state {
+  padding: 2.5rem 1rem;
+  text-align: center;
+
+  color: var(--text-muted);
+
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+
+  font-size: 0.9rem;
+}
+
+/* =========================
+   PROJECT ITEM
+========================= */
+
+.project-item {
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+
+  border-radius: 10px;
+
+  padding: 1rem 1rem 0.9rem;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.project-item:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+/* =========================
+   PROJECT HEADER
+========================= */
+
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.project-header h3 {
+  min-width: 0;
+
+  color: var(--text-primary);
+
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
+}
+
+.project-header > h3 {
+  flex: 1;
+}
+
+.project-header .status-badge,
+.project-header select {
+  flex-shrink: 0;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status-badge {
+  min-height: 30px;
+
+  padding: 0.3rem 0.65rem;
+
+  border-radius: 999px;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Select version */
+
+select.status-badge {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 0.7rem;
+
+  background-color: transparent;
+  outline: none;
+
+  cursor: pointer;
+}
+
+/* In Progress */
+
+.status-in-progress {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* On Hold */
+
+.status-on-hold {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Completed */
+
+.status-completed {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* =========================
+   DELETE BUTTON
+========================= */
+
+.btn-delete {
+  display: grid;
+  place-items: center;
+
+  width: 30px;
+  height: 30px;
+
+  margin-left: auto;
+
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  color: #64748b;
+
+  font-size: 1.15rem;
+  line-height: 1;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-delete:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.btn-delete:active {
+  transform: scale(0.95);
+}
+
+/* =========================
+   PROGRESS BAR
+========================= */
+
+.progress-container {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  background: #0a1220;
+  border-radius: 999px;
+
+  margin-bottom: 0.85rem;
+}
+
+.progress-bar {
+  height: 100%;
+
+  border-radius: inherit;
+
+  min-width: 0;
+
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* =========================
+   CARD CONTROLS
+========================= */
+
+.card-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-controls label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.card-controls input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+
+  accent-color: var(--accent-default);
+
+  cursor: pointer;
+}
+
+.card-controls > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.card-controls span {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================
+   RANGE SLIDER
+========================= */
+
+.card-controls input[type="range"] {
+  width: 110px;
+  height: 4px;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background: #334155;
+  border-radius: 999px;
+
+  outline: none;
+  cursor: pointer;
+}
+
+.card-controls input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+
+  background: var(--accent-default);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3);
+
+  cursor: pointer;
+}
+
+.card-controls input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+
+  background: var(--accent-default);
+
+  cursor: pointer;
+}
+
+/* =========================
+   FOCUS STATES
+========================= */
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.7);
+  outline-offset: 2px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 850px) {
+  body {
+    padding: 1.25rem;
+  }
+
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.7rem;
+  }
+
+  .main-content {
+    gap: 1rem;
+  }
+
+  .form-card,
+  .list-card {
+    padding: 1rem;
+  }
+
+  .project-header {
+    align-items: flex-start;
+  }
+
+  .project-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .card-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-controls > div {
+    width: 100%;
+  }
+
+  .card-controls input[type="range"] {
+    flex: 1;
+    width: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .project-header {
+    gap: 0.5rem;
+  }
+
+  .status-badge {
+    font-size: 0.62rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .btn-delete {
+    width: 28px;
+    height: 28px;
+  }
+}
