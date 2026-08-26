@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+const STORAGE_KEY = 'devpulse_items';
 
 const INITIAL_ITEMS = [
   {
@@ -7,7 +9,7 @@ const INITIAL_ITEMS = [
     type: 'Project',
     status: 'In Progress',
     desc: 'Upgrading internal component libraries and testing concurrent features.',
-    accent: '#38bdf8'
+    accent: '#38bdf8',
   },
   {
     id: '2',
@@ -15,7 +17,7 @@ const INITIAL_ITEMS = [
     type: 'Event',
     status: 'Registered',
     desc: 'Virtual keynote on modern frontend architecture and web tooling.',
-    accent: '#a855f7'
+    accent: '#a855f7',
   },
   {
     id: '3',
@@ -23,151 +25,270 @@ const INITIAL_ITEMS = [
     type: 'Project',
     status: 'Backlog',
     desc: 'Reviewing styling configuration and utility class breaking changes.',
-    accent: '#f59e0b'
-  }
+    accent: '#f59e0b',
+  },
 ];
 
-export default function App() {
-  const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem('devpulse_items');
-    return saved ? JSON.parse(saved) : INITIAL_ITEMS;
-  });
+const EMPTY_FORM = {
+  title: '',
+  type: 'Project',
+  status: 'In Progress',
+  desc: '',
+  accent: '#38bdf8',
+};
 
+const FILTERS = ['All', 'Project', 'Event'];
+
+function getStoredItems() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) {
+      return INITIAL_ITEMS;
+    }
+
+    const parsed = JSON.parse(saved);
+
+    return Array.isArray(parsed) ? parsed : INITIAL_ITEMS;
+  } catch (error) {
+    console.error('Failed to load saved items:', error);
+    return INITIAL_ITEMS;
+  }
+}
+
+export default function App() {
+  const [items, setItems] = useState(getStoredItems);
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState(EMPTY_FORM);
 
-  // New Item Form State
-  const [formData, setFormData] = useState({
-    title: '',
-    type: 'Project',
-    status: 'In Progress',
-    desc: '',
-    accent: '#38bdf8'
-  });
-
+  // Save items whenever they change
   useEffect(() => {
-    localStorage.setItem('devpulse_items', JSON.stringify(items));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error('Failed to save items:', error);
+    }
   }, [items]);
+
+  const filteredItems = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    return items.filter((item) => {
+      const matchesFilter =
+        filter === 'All' || item.type === filter;
+
+      const matchesSearch =
+        !normalizedSearch ||
+        item.title.toLowerCase().includes(normalizedSearch) ||
+        item.desc.toLowerCase().includes(normalizedSearch) ||
+        item.status.toLowerCase().includes(normalizedSearch);
+
+      return matchesFilter && matchesSearch;
+    });
+  }, [items, filter, search]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleAddItem = (e) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+
+    const title = formData.title.trim();
+
+    if (!title) return;
 
     const newItem = {
       ...formData,
-      id: Date.now().toString()
+      title,
+      desc: formData.desc.trim(),
+      id: crypto.randomUUID(),
     };
 
-    setItems([newItem, ...items]);
+    setItems((prevItems) => [newItem, ...prevItems]);
+
+    setFormData(EMPTY_FORM);
     setIsModalOpen(false);
-    setFormData({
-      title: '',
-      type: 'Project',
-      status: 'In Progress',
-      desc: '',
-      accent: '#38bdf8'
-    });
   };
 
   const handleDelete = (id) => {
-    setItems(items.filter(item => item.id !== id));
+    setItems((prevItems) =>
+      prevItems.filter((item) => item.id !== id)
+    );
   };
 
-  const filteredItems = items.filter(item => {
-    const matchesFilter = filter === 'All' || item.type === filter;
-    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase()) || 
-                          item.desc.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData(EMPTY_FORM);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseModal();
+    }
+  };
 
   return (
     <div className="app-container">
       {/* Header */}
       <header className="header">
         <div className="brand">
-          <div className="brand-icon"></div>
+          <div className="brand-icon" aria-hidden="true"></div>
           <h1>DevPulse</h1>
         </div>
-        <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
+
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => setIsModalOpen(true)}
+        >
           + Add New
         </button>
       </header>
 
       {/* Controls */}
-      <div className="controls">
-        <input 
-          type="text" 
-          className="search-input" 
-          placeholder="Search items..." 
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <section className="controls">
+        <label className="search-wrapper">
+          <span className="sr-only">Search items</span>
 
-        <div className="tabs">
-          {['All', 'Project', 'Event'].map(tab => (
-            <button 
-              key={tab} 
-              className={`tab-btn ${filter === tab ? 'active' : ''}`}
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Search items..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
+
+        <div className="tabs" role="tablist" aria-label="Filter items">
+          {FILTERS.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`tab-btn ${
+                filter === tab ? 'active' : ''
+              }`}
               onClick={() => setFilter(tab)}
+              role="tab"
+              aria-selected={filter === tab}
             >
-              {tab}s
+              {tab === 'All' ? 'All' : `${tab}s`}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Grid */}
-      <div className="card-grid">
-        {filteredItems.map((item) => (
-          <div 
-            key={item.id} 
-            className="card"
-            style={{ '--card-accent': item.accent }}
-          >
-            <div className="card-accent-strip"></div>
-            <div>
-              <div className="card-header">
-                <span className="card-type">{item.type}</span>
+      {/* Cards */}
+      <main className="card-grid">
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <article
+              key={item.id}
+              className="card"
+              style={{
+                '--card-accent': item.accent,
+              }}
+            >
+              <div className="card-accent-strip"></div>
+
+              <div className="card-content">
+                <div className="card-header">
+                  <span className="card-type">
+                    {item.type}
+                  </span>
+                </div>
+
+                <h3 className="card-title">
+                  {item.title}
+                </h3>
+
+                <p className="card-desc">
+                  {item.desc || 'No description provided.'}
+                </p>
               </div>
-              <h3 className="card-title">{item.title}</h3>
-              <p className="card-desc">{item.desc}</p>
-            </div>
 
-            <div className="card-footer">
-              <span className="status-badge">{item.status}</span>
-              <button 
-                className="btn-delete" 
-                onClick={() => handleDelete(item.id)}
+              <div className="card-footer">
+                <span className="status-badge">
+                  {item.status}
+                </span>
+
+                <button
+                  type="button"
+                  className="btn-delete"
+                  onClick={() => handleDelete(item.id)}
+                  aria-label={`Delete ${item.title}`}
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))
+        ) : (
+          <div className="empty-state">
+            <h3>No entries found</h3>
+            <p>
+              Try a different search term or filter.
+            </p>
+          </div>
+        )}
+      </main>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div
+          className="modal-overlay"
+          onMouseDown={handleOverlayClick}
+        >
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+          >
+            <div className="modal-header">
+              <h2 id="modal-title">Add New Entry</h2>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={handleCloseModal}
+                aria-label="Close modal"
               >
-                Delete
+                ×
               </button>
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Add Item Modal */}
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Add New Entry</h2>
             <form onSubmit={handleAddItem}>
               <div className="form-group">
-                <label>Title</label>
-                <input 
-                  type="text" 
+                <label htmlFor="title">Title</label>
+
+                <input
+                  id="title"
+                  name="title"
+                  type="text"
+                  placeholder="Enter a title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  autoFocus
                   required
-                  value={formData.title} 
-                  onChange={e => setFormData({...formData, title: e.target.value})} 
                 />
               </div>
 
               <div className="form-group">
-                <label>Type</label>
-                <select 
-                  value={formData.type} 
-                  onChange={e => setFormData({...formData, type: e.target.value})}
+                <label htmlFor="type">Type</label>
+
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
                 >
                   <option value="Project">Project</option>
                   <option value="Event">Event</option>
@@ -175,37 +296,56 @@ export default function App() {
               </div>
 
               <div className="form-group">
-                <label>Status</label>
-                <input 
-                  type="text" 
-                  value={formData.status} 
-                  onChange={e => setFormData({...formData, status: e.target.value})} 
+                <label htmlFor="status">Status</label>
+
+                <input
+                  id="status"
+                  name="status"
+                  type="text"
+                  placeholder="e.g. In Progress"
+                  value={formData.status}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="form-group">
-                <label>Accent Color</label>
-                <input 
-                  type="color" 
-                  value={formData.accent} 
-                  onChange={e => setFormData({...formData, accent: e.target.value})} 
+                <label htmlFor="accent">Accent Color</label>
+
+                <input
+                  id="accent"
+                  name="accent"
+                  type="color"
+                  value={formData.accent}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="form-group">
-                <label>Description</label>
-                <textarea 
+                <label htmlFor="desc">Description</label>
+
+                <textarea
+                  id="desc"
+                  name="desc"
                   rows="3"
-                  value={formData.desc} 
-                  onChange={e => setFormData({...formData, desc: e.target.value})} 
+                  placeholder="Add a short description..."
+                  value={formData.desc}
+                  onChange={handleInputChange}
                 />
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleCloseModal}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                >
                   Save Entry
                 </button>
               </div>
