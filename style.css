@@ -564,3 +564,26 @@ select.status-badge {
 .card-controls input[type="checkbox"]:active {
   transform: scale(0.85);
 }
+/* =========================
+   RESPONSIVE LAYOUT (MOBILE)
+========================= */
+
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  .main-content {
+    grid-template-columns: 1fr; /* Stacks sidebar above list on small screens */
+  }
+
+  .form-card {
+    position: static; /* Unsticks form on mobile */
+  }
+}
+
+/* Fix dropdown arrow padding for status dropdowns */
+select.status-badge option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
